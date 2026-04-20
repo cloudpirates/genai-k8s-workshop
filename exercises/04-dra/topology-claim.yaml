@@ -1,0 +1,18 @@
+# Topology-aware ResourceClaim — request 4 GPUs on the same NUMA node
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaim
+metadata:
+  name: topology-aware-gpus
+spec:
+  devices:
+    requests:
+    - name: training-gpus
+      deviceClassName: gpu.nvidia.com
+      selectors:
+      - cel:
+          expression: >
+            device.attributes['gpu.nvidia.com'].productName == 'H100'
+      count: 4
+    constraints:
+    - requests: ["training-gpus"]
+      matchAttribute: "gpu.nvidia.com/numaNode"

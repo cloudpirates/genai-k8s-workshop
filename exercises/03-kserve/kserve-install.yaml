@@ -1,0 +1,14 @@
+# KServe quick install for workshops (raw deployment mode, no Knative)
+# For the latest version, see: https://kserve.github.io/website/latest/admin/serverless/
+#
+# This is a placeholder — during the workshop, we'll use the official install:
+#   kubectl apply -f https://github.com/kserve/kserve/releases/download/v0.14.1/kserve.yaml
+#   kubectl apply -f https://github.com/kserve/kserve/releases/download/v0.14.1/kserve-cluster-resources.yaml
+#
+# The actual install manifests are large (~5000 lines) and version-dependent.
+# See scripts/setup.sh for the automated installation.
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kserve

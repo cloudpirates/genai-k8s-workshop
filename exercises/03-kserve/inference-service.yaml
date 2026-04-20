@@ -1,0 +1,18 @@
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  name: tiny-llm
+spec:
+  predictor:
+    model:
+      modelFormat:
+        name: huggingface
+      runtime: kserve-huggingfaceserver
+      storageUri: "hf://facebook/opt-125m"
+    resources:
+      requests:
+        cpu: "2"
+        memory: 4Gi
+      limits:
+        cpu: "4"
+        memory: 8Gi

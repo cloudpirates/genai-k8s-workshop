@@ -1,0 +1,9 @@
+apiVersion: inference.networking.x-k8s.io/v1alpha2
+kind: InferenceModel
+metadata:
+  name: opt-125m
+spec:
+  modelName: facebook/opt-125m
+  criticality: Critical
+  poolRef:
+    name: llm-pool

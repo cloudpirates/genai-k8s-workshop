@@ -1,0 +1,96 @@
+# Gateway API Inference Extension CRDs
+# For the latest version, install from the official source:
+#   kubectl apply -f https://github.com/kubernetes-sigs/gateway-api-inference-extension/releases/latest/download/manifests.yaml
+#
+# These are simplified CRD definitions for workshop demonstration.
+# The full CRDs include validation, status subresources, and more fields.
+
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: inferencemodels.inference.networking.x-k8s.io
+spec:
+  group: inference.networking.x-k8s.io
+  versions:
+  - name: v1alpha2
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              modelName:
+                type: string
+              criticality:
+                type: string
+                enum: ["Critical", "BestEffort"]
+              targetModel:
+                type: string
+              poolRef:
+                type: object
+                properties:
+                  name:
+                    type: string
+    additionalPrinterColumns:
+    - name: Model
+      type: string
+      jsonPath: .spec.modelName
+    - name: Criticality
+      type: string
+      jsonPath: .spec.criticality
+    - name: Pool
+      type: string
+      jsonPath: .spec.poolRef.name
+  scope: Namespaced
+  names:
+    plural: inferencemodels
+    singular: inferencemodel
+    kind: InferenceModel
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: inferencepools.inference.networking.x-k8s.io
+spec:
+  group: inference.networking.x-k8s.io
+  versions:
+  - name: v1alpha2
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              targetPortNumber:
+                type: integer
+              selector:
+                type: object
+                properties:
+                  matchLabels:
+                    type: object
+                    additionalProperties:
+                      type: string
+              endpointPickerConfig:
+                type: object
+                properties:
+                  extensionRef:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+    additionalPrinterColumns:
+    - name: Port
+      type: integer
+      jsonPath: .spec.targetPortNumber
+  scope: Namespaced
+  names:
+    plural: inferencepools
+    singular: inferencepool
+    kind: InferencePool

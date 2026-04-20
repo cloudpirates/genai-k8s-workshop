@@ -1,0 +1,21 @@
+# Kind cluster configuration with simulated GPU node labels
+# No real GPUs needed — labels are for scheduling exploration
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+- role: control-plane
+- role: worker
+  labels:
+    accelerator: nvidia-gpu
+    nvidia.com/gpu.product: H100
+    nvidia.com/gpu.memory: "80Gi"
+    topology.kubernetes.io/zone: gpu-zone-1
+- role: worker
+  labels:
+    accelerator: nvidia-gpu
+    nvidia.com/gpu.product: A100
+    nvidia.com/gpu.memory: "80Gi"
+    topology.kubernetes.io/zone: gpu-zone-2
+- role: worker
+  labels:
+    node-role: cpu-inference

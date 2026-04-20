@@ -1,0 +1,15 @@
+# Basic ResourceClaim — request a specific GPU type
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaim
+metadata:
+  name: training-gpu
+spec:
+  devices:
+    requests:
+    - name: gpu
+      deviceClassName: gpu.nvidia.com
+      selectors:
+      - cel:
+          expression: >
+            device.attributes['gpu.nvidia.com'].productName == 'H100' &&
+            device.attributes['gpu.nvidia.com'].memory >= 80

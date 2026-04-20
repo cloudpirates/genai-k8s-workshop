@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vllm-cpu
+  labels:
+    app: vllm-cpu
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vllm-cpu
+  template:
+    metadata:
+      labels:
+        app: vllm-cpu
+    spec:
+      containers:
+      - name: vllm
+        image: vllm/vllm-openai:latest
+        args:
+        - --model
+        - facebook/opt-125m
+        - --device
+        - cpu
+        - --dtype
+        - float32
+        - --max-model-len
+        - "512"
+        env:
+        - name: VLLM_CPU_KVCACHE_SPACE
+          value: "2"
+        - name: VLLM_CPU_OMP_THREADS_BIND
+          value: "auto"
+        ports:
+        - containerPort: 8000
+          name: http
+        resources:
+          requests:
+            cpu: "4"
+            memory: 4Gi
+          limits:
+            cpu: "8"
+            memory: 8Gi
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 180
+          periodSeconds: 15
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 120
+          periodSeconds: 10
+      nodeSelector:
+        node-role: cpu-inference
