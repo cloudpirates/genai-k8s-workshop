@@ -55,6 +55,19 @@ kubectl wait --for=condition=Available deployment --all -n kserve --timeout=180s
 echo "✅ KServe installed"
 
 echo ""
+echo "=== Installing fake-gpu-operator ==="
+helm repo add fake-gpu-operator https://fake-gpu-operator.storage.googleapis.com 2>/dev/null || true
+helm repo update fake-gpu-operator
+helm install fake-gpu-operator fake-gpu-operator/fake-gpu-operator \
+  --namespace gpu-operator --create-namespace \
+  --set topology.nodes[0].gpuModel=A100 \
+  --set topology.nodes[0].gpuCount=4 \
+  --set topology.nodes[0].nodeLabels."nvidia\.com/gpu\.product"=A100
+echo "Waiting for fake-gpu-operator..."
+kubectl wait --for=condition=Available deployment --all -n gpu-operator --timeout=120s || echo "⚠️  fake-gpu-operator may still be starting"
+echo "✅ fake-gpu-operator installed (4x A100 per node)"
+
+echo ""
 echo "=== Installing Gateway API Inference Extension CRDs ==="
 kubectl apply -f "$REPO_DIR/exercises/05-gateway/crds.yaml"
 echo "✅ Inference Extension CRDs installed"

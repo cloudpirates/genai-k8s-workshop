@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gpu-greedy
+spec:
+  replicas: 6
+  selector:
+    matchLabels:
+      app: gpu-greedy
+  template:
+    metadata:
+      labels:
+        app: gpu-greedy
+    spec:
+      containers:
+      - name: worker
+        image: busybox:1.36
+        command: ["sh", "-c", "echo 'GPU worker running' && sleep 300"]
+        resources:
+          limits:
+            nvidia.com/gpu: 1
