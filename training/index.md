@@ -40,13 +40,15 @@ AI inference platform covering the key CNCF projects:
 
 | Unit | Min | Topic |
 | ---- | --- | ----- |
-| 1    | 10  | Intro: The Cloud Native AI Stack |
-| 2    | 10  | Lab 1: Cluster Setup + fake-gpu-operator |
-| 3    | 20  | Lab 2: Deploy vLLM in CPU Mode |
-| 4    | 15  | Lab 3: KServe InferenceService |
-| 5    | 15  | Lab 4: GPU Scheduling & DRA |
-| 6    | 10  | Lab 5: Gateway API Inference Extension |
-| 7    | 10  | Wrap-up: CNCF AI Conformance & What's Next |
+| —    | 30  | Slides: The Cloud Native AI Stack |
+| 1    | 8   | Lab 1: Cluster Setup + fake-gpu-operator |
+| 2    | 12  | Lab 2: Deploy an LLM (Ollama + TinyLlama) |
+| 3    | 8   | Lab 3: KServe InferenceService |
+| 4    | 10  | Lab 4: GPU Scheduling & DRA |
+| 5    | 5   | Lab 5: Gateway API Inference Extension |
+| 6    | 8   | Lab 6: KAITO Workspace |
+| 7    | 8   | Lab 7: llm-d Disaggregated Inference |
+| —    | 5   | Wrap-up: CNCF AI Conformance & Q&A |
 
 ### Prerequisites
 
