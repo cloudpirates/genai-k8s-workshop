@@ -26,7 +26,6 @@ The **Gateway API Inference Extension** adds two CRDs:
 ### 1. Install the CRDs
 
 ```bash
-kubectl apply -f https://github.com/kubernetes-sigs/gateway-api-inference-extension/releases/latest/download/manifests.yaml 2>/dev/null || \
 cat <<EOF | kubectl apply -f -
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
@@ -74,6 +73,12 @@ spec:
             type: object
             x-kubernetes-preserve-unknown-fields: true
 EOF
+```
+
+Wait a few seconds for the CRDs to register:
+
+```bash
+sleep 5
 ```
 
 ### 2. Create an InferencePool
