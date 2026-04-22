@@ -1,0 +1,81 @@
+kind: playground
+name: genai-k8s-workshop
+base: k3s
+title: "Generative AI in Kubernetes Workshop"
+description: |
+  A Kubernetes cluster pre-configured for the GenAI workshop.
+  Includes Helm, cert-manager, and pre-pulled images for Ollama and KServe.
+cover: __static__/genai-k8s-cover.png
+categories:
+  - kubernetes
+  - containers
+playground:
+  networks:
+    - name: local
+      subnet: 172.16.0.0/24
+  machines:
+    - name: dev-machine
+      users:
+        - name: root
+        - name: laborant
+          default: true
+      drives:
+        - source: k3s-dev-machine
+          mount: /
+          size: 30GiB
+      network:
+        interfaces:
+          - address: 172.16.0.5/24
+            network: local
+      resources:
+        cpu: 4
+        ram: 16GiB
+  tasks:
+    init:
+      machine: dev-machine
+      user: root
+      run: |
+        #!/bin/bash
+        set -euo pipefail
+
+        # Install Helm
+        curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+        # Wait for k3s
+        until kubectl get nodes 2>/dev/null | grep -q " Ready"; do sleep 2; done
+
+        # Delete conflicting k3s RuntimeClass
+        kubectl delete runtimeclass nvidia 2>/dev/null || true
+
+        # Install cert-manager
+        kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.16.3/cert-manager.yaml
+        kubectl wait --for=condition=Available deployment --all -n cert-manager --timeout=120s || true
+
+        # Pre-pull Ollama image on worker nodes (saves 3-5 min during workshop)
+        for node in $(kubectl get nodes -l '!node-role.kubernetes.io/control-plane' -o name); do
+          node_name=${node#node/}
+          kubectl run prepull-$node_name --image=ollama/ollama:latest --restart=Never \
+            --overrides="{\"spec\":{\"nodeName\":\"$node_name\",\"containers\":[{\"name\":\"prepull\",\"image\":\"ollama/ollama:latest\",\"command\":[\"echo\",\"done\"]}]}}" 2>/dev/null || true
+        done
+
+        # Drop a workshop-setup helper script
+        cat > /usr/local/bin/workshop-setup << 'SETUP'
+        #!/bin/bash
+        set -euo pipefail
+        echo "Installing fake-gpu-operator..."
+        kubectl delete runtimeclass nvidia 2>/dev/null || true
+        helm repo add fake-gpu-operator https://fake-gpu-operator.storage.googleapis.com 2>/dev/null
+        helm repo update fake-gpu-operator
+        helm install fake-gpu-operator fake-gpu-operator/fake-gpu-operator \
+          --namespace gpu-operator --create-namespace \
+          --set topology.nodes[0].gpuModel=A100 \
+          --set topology.nodes[0].gpuCount=4
+        kubectl label node node-01 run.ai/simulated-gpu-node-pool=default --overwrite
+        echo "Waiting for GPU registration..."
+        sleep 15
+        echo "GPU capacity: $(kubectl get node node-01 -o jsonpath='{.status.capacity.nvidia\.com/gpu}')"
+        echo "✅ Setup complete!"
+        SETUP
+        chmod +x /usr/local/bin/workshop-setup
+
+        echo "Setup complete — cluster ready for GenAI workshop!"
