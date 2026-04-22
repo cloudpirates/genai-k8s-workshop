@@ -115,11 +115,50 @@ playground:
         # Delete k3s built-in nvidia RuntimeClass (conflicts with fake-gpu-operator)
         kubectl delete runtimeclass nvidia 2>/dev/null || true
 
-        # Pre-pull Ollama image on worker nodes to save time during the workshop
-        for node_name in node-01 node-02; do
-          kubectl run prepull-${node_name} --image=ollama/ollama:latest --restart=Never \
-            --overrides="{\"spec\":{\"nodeName\":\"${node_name}\",\"containers\":[{\"name\":\"prepull\",\"image\":\"ollama/ollama:latest\",\"command\":[\"echo\",\"done\"]}]}}" 2>/dev/null || true
-        done
+        # Deploy Ollama on a worker node and pre-pull the TinyLlama model
+        # This saves ~5 min per student during Lab 2
+        cat <<OLLAMA | kubectl apply -f -
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+          name: ollama-prepull
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              app: ollama-prepull
+          template:
+            metadata:
+              labels:
+                app: ollama-prepull
+            spec:
+              containers:
+              - name: ollama
+                image: ollama/ollama:latest
+                ports:
+                - containerPort: 11434
+                resources:
+                  requests:
+                    cpu: "500m"
+                    memory: 1Gi
+                  limits:
+                    cpu: "1"
+                    memory: 2Gi
+        OLLAMA
+
+        echo "Waiting for Ollama to be ready..."
+        kubectl rollout status deployment/ollama-prepull --timeout=300s || true
+
+        # Pull TinyLlama model (637MB) so it's cached in the container
+        PREPULL_POD=$(kubectl get pod -l app=ollama-prepull -o jsonpath='{.items[0].metadata.name}' 2>/dev/null)
+        if [ -n "$PREPULL_POD" ]; then
+          echo "Pre-pulling TinyLlama model..."
+          kubectl exec $PREPULL_POD -c ollama -- ollama pull tinyllama 2>&1 | tail -3 || true
+          echo "Model cached!"
+        fi
+
+        # Clean up the prepull deployment (image stays cached on the node)
+        kubectl delete deployment ollama-prepull 2>/dev/null || true
 
         echo ""
         echo "========================================="
@@ -128,7 +167,8 @@ playground:
         echo "  Cluster: $(kubectl get nodes --no-headers | wc -l | tr -d ' ') nodes ready"
         echo "  Helm: $(helm version --short)"
         echo "  cert-manager: installed"
-        echo "  Ollama: pre-pulling on worker nodes"
+        echo "  Ollama image: cached on worker node"
+        echo "  TinyLlama model: pre-pulled"
         echo ""
         echo "  Start with Lab 1!"
         echo "========================================="
