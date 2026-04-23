@@ -1,8 +1,9 @@
 ---
 kind: unit
-title: "Lab 6: KAITO — Kubernetes AI Toolchain Operator"
-name: lab6-kaito
+title: "Lab 6: KAITO Workspace"
+name: kaito-practice
 ---
+
 
 # Lab 6: KAITO — Kubernetes AI Toolchain Operator
 

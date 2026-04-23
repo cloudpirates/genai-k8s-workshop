@@ -1,8 +1,9 @@
 ---
 kind: unit
 title: "Lab 5: Gateway API Inference Extension"
-name: lab5-gateway-inference
+name: gateway-api-practice
 ---
+
 
 # Lab 5: Gateway API Inference Extension
 

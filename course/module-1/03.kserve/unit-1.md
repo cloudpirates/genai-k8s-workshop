@@ -1,8 +1,9 @@
 ---
 kind: unit
 title: "Lab 3: KServe InferenceService"
-name: lab3-kserve
+name: kserve-practice
 ---
+
 
 # Lab 3: KServe InferenceService
 

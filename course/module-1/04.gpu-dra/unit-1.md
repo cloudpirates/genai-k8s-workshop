@@ -1,8 +1,9 @@
 ---
 kind: unit
 title: "Lab 4: GPU Scheduling & DRA"
-name: lab4-gpu-dra
+name: gpu-dra-practice
 ---
+
 
 # Lab 4: GPU Scheduling & DRA
 

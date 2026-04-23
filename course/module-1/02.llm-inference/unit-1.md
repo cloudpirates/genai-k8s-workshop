@@ -1,8 +1,9 @@
 ---
 kind: unit
 title: "Lab 2: Deploy an LLM on Kubernetes"
-name: lab2-llm-inference
+name: llm-inference-practice
 ---
+
 
 # Lab 2: Deploy an LLM on Kubernetes
 

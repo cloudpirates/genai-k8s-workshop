@@ -1,8 +1,9 @@
 ---
 kind: unit
 title: "Lab 1: Cluster Setup + Fake GPU Operator"
-name: lab1-cluster-setup
+name: cluster-setup-practice
 ---
+
 
 # Lab 1: Cluster Setup + Fake GPU Operator
 

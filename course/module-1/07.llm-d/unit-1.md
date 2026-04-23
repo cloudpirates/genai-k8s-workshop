@@ -1,8 +1,9 @@
 ---
 kind: unit
-title: "Lab 7: llm-d — Disaggregated Inference"
-name: lab7-llm-d
+title: "Lab 7: llm-d Disaggregated Inference"
+name: llm-d-practice
 ---
+
 
 # Lab 7: llm-d — Disaggregated Inference
 
